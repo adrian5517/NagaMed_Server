@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const SECRET_KEY = process.env.SECRET_KEY;
+
 
 const userSchema = new mongoose.Schema(
   {
@@ -15,6 +15,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Email is required"],
       unique: true,
+    },
+    address:{
+      type: String,
+    },
+    contact: {
+      type: String,
+    },
+    date_of_birth: {
+      type: Date,
     },
     password: {
       type: String,
