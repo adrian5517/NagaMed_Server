@@ -3,8 +3,8 @@ const Appointment = require("../models/appointmentModel");
 // Create Appointment
 exports.createAppointment = async (req, res) => {
   try {
-    const { patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
-    const appointment = new Appointment({ patient_id, doctor_id, clinic_id, appointment_date_time, status });
+    const { appointment_id, patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
+    const appointment = new Appointment({ appointment_id, patient_id, doctor_id, clinic_id, appointment_date_time, status });
 
     await appointment.save();
     res.status(201).json({ message: "Appointment created successfully", appointment });
@@ -17,7 +17,7 @@ exports.createAppointment = async (req, res) => {
 exports.getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find({})
-    res.status(200).json(appointment);
+    res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
