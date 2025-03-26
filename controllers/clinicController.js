@@ -51,6 +51,7 @@ const getClinicById = async (req, res) => {
 };
 
 // Get Doctors by Clinic ID
+// Get Doctors by Clinic ID
 const getDoctorsByClinic = async (req, res) => {
   try {
     const clinic = await Clinic.findById(req.params.id);
@@ -58,7 +59,9 @@ const getDoctorsByClinic = async (req, res) => {
       return res.status(404).json({ error: 'Clinic not found' });
     }
 
-    const doctors = await Doctor.find({ clinicId: clinic._id });
+    // Corrected: Use clinic_id instead of clinicId
+    const doctors = await Doctor.find({ clinic_id: clinic._id });
+
     if (doctors.length === 0) {
       return res.status(404).json({ error: 'No doctors available for this clinic.' });
     }
