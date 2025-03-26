@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
-  appointment_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-  },
   patient_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -21,9 +16,10 @@ const appointmentSchema = new mongoose.Schema({
     ref: 'Clinic',
     required: true,
   },
-  userType:{
+  userType: {
     type: String,
-    
+    enum: ['Patient', 'Doctor'],
+    required: true,
   },
   appointment_date_time: {
     type: Date,
@@ -35,6 +31,9 @@ const appointmentSchema = new mongoose.Schema({
     default: 'Pending',
   },
 }, { timestamps: true });
+
+// Optional: Add Indexes
+appointmentSchema.index({ patient_id: 1, doctor_id: 1 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 module.exports = Appointment;
