@@ -17,7 +17,7 @@ exports.createAppointment = async (req, res) => {
 exports.getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find({})
-    res.status(200).json(appointments);
+    res.status(200).json(appointment);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
