@@ -4,7 +4,6 @@ const appointmentSchema = new mongoose.Schema({
   patient_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
   },
   doctor_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +18,6 @@ const appointmentSchema = new mongoose.Schema({
   userType: {
     type: String,
     enum: ['Patient', 'Doctor'],
-    required: true,
   },
   appointment_date_time: {
     type: Date,
