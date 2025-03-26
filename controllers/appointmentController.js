@@ -3,8 +3,8 @@ const Appointment = require("../models/appointmentModel");
 // Create Appointment
 exports.createAppointment = async (req, res) => {
   try {
-    const { appointment_id, patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
-    const appointment = new Appointment({ appointment_id, patient_id, doctor_id, clinic_id, appointment_date_time, status });
+    const { patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
+    const appointment = new Appointment({ patient_id, doctor_id, clinic_id, appointment_date_time, status });
 
     await appointment.save();
     res.status(201).json({ message: "Appointment created successfully", appointment });
