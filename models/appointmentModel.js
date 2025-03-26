@@ -4,12 +4,11 @@ const appointmentSchema = new mongoose.Schema({
   patient_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: function() { return this.userType === 'Patient'; }
   },
   doctor_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Doctor',
-    required: function() { return this.userType === 'Doctor'; }
+    
   },
   clinic_id: {
     type: mongoose.Schema.Types.ObjectId,
