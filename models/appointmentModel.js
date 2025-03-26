@@ -4,11 +4,12 @@ const appointmentSchema = new mongoose.Schema({
   patient_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    required: function() { return this.userType === 'Patient'; }
   },
   doctor_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Doctor',
-    required: true,
+    required: function() { return this.userType === 'Doctor'; }
   },
   clinic_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -18,10 +19,22 @@ const appointmentSchema = new mongoose.Schema({
   userType: {
     type: String,
     enum: ['Patient', 'Doctor'],
+    default: 'Patient',
+  },
+  reason: {
+    type: String,
+    required: true,
+    trim: true,
   },
   appointment_date_time: {
     type: Date,
     required: true,
+    validate: {
+      validator: function(value) {
+        return value > new Date();
+      },
+      message: 'Appointment date must be in the future.',
+    },
   },
   status: {
     type: String,
@@ -30,8 +43,7 @@ const appointmentSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-// Optional: Add Indexes
-appointmentSchema.index({ patient_id: 1, doctor_id: 1 });
+appointmentSchema.index({ appointment_date_time: 1 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 module.exports = Appointment;
