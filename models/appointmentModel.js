@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
   appointment_id: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     unique: true,
   },
