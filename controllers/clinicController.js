@@ -4,7 +4,7 @@ const Doctor = require('../models/doctorsModel');
 const getAllClinics = async (req, res) => {
   try {
     const clinic = await Clinic.find().populate('feedback_id');
-    res.json(clinics);
+    res.json(clinic);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
