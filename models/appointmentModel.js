@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const appointmentSchema = new mongoose.Schema({
   patient_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -7,6 +8,7 @@ const appointmentSchema = new mongoose.Schema({
   doctor_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Doctor',
+    
   },
   clinic_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -26,7 +28,7 @@ const appointmentSchema = new mongoose.Schema({
     type: Date,
     required: true,
     validate: {
-      validator: function (value) {
+      validator: function(value) {
         return value > new Date();
       },
       message: 'Appointment date must be in the future.',
@@ -39,7 +41,6 @@ const appointmentSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-// Remove any unnecessary indexes
 appointmentSchema.index({ appointment_date_time: 1 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
