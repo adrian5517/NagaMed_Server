@@ -68,8 +68,8 @@ const getDoctorsByClinic = async (req, res) => {
       return res.status(404).json({ error: "Clinic not found" });
     }
 
-    // Find doctors by clinic_id (not clinicId)
-    const doctors = await Doctor.find({ clinic_id: clinicId }); // Adjusted to match the field name
+    // Find doctors by clinic_id (ensure the value is properly cast to ObjectId)
+    const doctors = await Doctor.find({ clinic_id: mongoose.Types.ObjectId(clinicId) }); // Ensures correct casting
 
     if (doctors.length === 0) {
       return res.status(404).json({ error: "No doctors available for this clinic." });
