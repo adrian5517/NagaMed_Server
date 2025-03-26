@@ -1,4 +1,5 @@
 const Clinic = require('../models/clinicModel');
+const Doctor = require('../models/doctorsModel');
 
 const getAllClinics = async (req, res) => {
   try {
@@ -49,11 +50,31 @@ const getClinicById = async (req, res) => {
   }
 };
 
+// Get Doctors by Clinic ID
+const getDoctorsByClinic = async (req, res) => {
+  try {
+    const clinic = await Clinic.findById(req.params.id);
+    if (!clinic) {
+      return res.status(404).json({ error: 'Clinic not found' });
+    }
+
+    const doctors = await Doctor.find({ clinicId: clinic._id });
+    if (doctors.length === 0) {
+      return res.status(404).json({ error: 'No doctors available for this clinic.' });
+    }
+
+    res.json(doctors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
     deleteClinic,
     createClinic,
     getClinicById,
     updateClinic,
-    getAllClinics
+    getAllClinics,
+    getDoctorsByClinic,
 
 }

@@ -6,6 +6,7 @@ const {
   createClinic,
   updateClinic,
   deleteClinic,
+  getDoctorsByClinic
 } = require('../controllers/clinicController');
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.get('/:id', getClinicById);
 router.post('/', createClinic);
 router.put('/:id', updateClinic);
 router.delete('/:id', deleteClinic);
+router.get('/:id/doctor', getDoctorsByClinic);
 
 module.exports = router;
