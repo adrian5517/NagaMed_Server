@@ -60,7 +60,7 @@ const deleteDoctor = async (req, res) => {
 
 const getDoctorsByClinic = async (req, res) => {
   try {
-    const clinicId = req.params.clinicId;
+    const clinicId = req.params.clinicId; // Retrieve the clinicId from URL parameter
 
     // Check if clinic exists
     const clinic = await Clinic.findById(clinicId);
@@ -68,8 +68,8 @@ const getDoctorsByClinic = async (req, res) => {
       return res.status(404).json({ error: "Clinic not found" });
     }
 
-    // Find doctors by clinicId
-    const doctors = await Doctor.find({ clinicId: clinicId });
+    // Find doctors by clinic_id (not clinicId)
+    const doctors = await Doctor.find({ clinic_id: clinicId }); // Adjusted to match the field name
 
     if (doctors.length === 0) {
       return res.status(404).json({ error: "No doctors available for this clinic." });
@@ -81,7 +81,6 @@ const getDoctorsByClinic = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 module.exports = {
     createDoctor,
