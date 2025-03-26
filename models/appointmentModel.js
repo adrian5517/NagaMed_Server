@@ -23,7 +23,6 @@ const appointmentSchema = new mongoose.Schema({
   },
   reason: {
     type: String,
-    required: true,
     trim: true,
   },
   appointment_date_time: {
