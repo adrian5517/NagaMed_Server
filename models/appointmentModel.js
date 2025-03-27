@@ -8,6 +8,7 @@ const appointmentSchema = new mongoose.Schema(
     doctor_id: { type: String, required: true },
     clinic_id: { type: String, required: true },
     appointment_date_time: { type: Date, required: true },
+    status: { type: String, required: true, enum: ["Pending", "Confirmed", "Cancelled"] },
   },
   { timestamps: true }
 );
