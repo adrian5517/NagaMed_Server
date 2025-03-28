@@ -1,4 +1,3 @@
-// models/clinic.model.js
 const mongoose = require('mongoose');
 
 const clinicSchema = new mongoose.Schema({

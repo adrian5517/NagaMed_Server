@@ -1,17 +1,42 @@
-const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
+const mongoose = require('mongoose');
 
-const appointmentSchema = new mongoose.Schema(
-  {
-    appointment_id: { type: String, unique: true, required: true, default: uuidv4 },
-    patient_id: { type: String, required: true },
-    doctor_id: { type: String, required: true },
-    clinic_id: { type: String, required: true },
-    appointment_date_time: { type: Date, required: true },
-    status: { type: String, required: true, enum: ["Pending", "Confirmed", "Cancelled"] },
+const appointmentSchema = new mongoose.Schema({
+  appointment_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    auto: true,
   },
-  { timestamps: true }
-);
+  patient_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
 
-const Appointment = mongoose.model("Appointment", appointmentSchema);
+  },
+  doctor_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Doctor',
+    required: true,
+  },
+  clinic_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Clinic',
+    required: true,
+  },
+  userType: {
+    type: String,
+    enum: ['Patient', 'Doctor'],
+  },
+  appointment_date_time: {
+    type: Date,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['Pending', 'Confirmed', 'Cancelled', 'Completed'],
+    default: 'Pending',
+  },
+}, { timestamps: true });
+
+// Optional: Add Indexes
+// appointmentSchema.index({ patient_id: 1, doctor_id: 1 });
+
+const Appointment = mongoose.model('Appointment', appointmentSchema);
 module.exports = Appointment;
