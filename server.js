@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');  // Added this line to require the cors package
 
 // Import Routes
 const authRoutes = require('./routers/authRoutes');
@@ -12,6 +13,10 @@ const feedbackRoutes = require('./routers/feedbackRoutes');
 const systemFeedbackRoutes = require('./routers/systemFeedbackRoutes');
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));  // Enabling CORS for your frontend on port 3000
 
 // Middleware
 app.use(express.json());
