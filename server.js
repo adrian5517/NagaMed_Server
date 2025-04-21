@@ -1,22 +1,31 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');  // Added this line to require the cors package
+const cors = require('cors');
 
 // Import Routes
 const authRoutes = require('./routers/authRoutes');
 const userRoutes = require('./routers/userRouter');
 const appointmentRoutes = require('./routers/appointmentRoutes');
 const doctorRoutes = require("./routers/doctorRoutes");
-const clinicRoutes = require('./routers/clinicRoutes')
+const clinicRoutes = require('./routers/clinicRoutes');
 const feedbackRoutes = require('./routers/feedbackRoutes');
 const systemFeedbackRoutes = require('./routers/systemFeedbackRoutes');
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));  // Enabling CORS for your frontend on port 3000
+// ✅ Explicit CORS setup
+const corsOptions = {
+  origin: 'http://localhost:3000', // Allow frontend dev server
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+// ✅ Handle preflight requests (important!)
+app.options('*', cors(corsOptions));
 
 // Middleware
 app.use(express.json());
@@ -31,6 +40,7 @@ app.use('/api/clinic', clinicRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/systemfeedback', systemFeedbackRoutes);
 
+// Base route
 app.get('/', (req, res) => {
   res.send('Welcome to Irinuman Club');
 });
