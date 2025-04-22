@@ -3,7 +3,7 @@ const Appointment = require("../models/appointmentModel");
 // Create Appointment
 exports.createAppointment = async (req, res) => {
   try {
-    const { appointment_id, patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
+    const {patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
 
     // Check for duplicate appointment_id
     // const existingAppointment = await Appointment.findOne({ appointment_id });
@@ -11,7 +11,7 @@ exports.createAppointment = async (req, res) => {
     //   return res.status(400).json({ message: "Appointment ID already exists." });
     // }
 
-    const appointment = new Appointment({ appointment_id, patient_id, doctor_id, clinic_id, appointment_date_time, status });
+    const appointment = new Appointment({ patient_id, doctor_id, clinic_id, appointment_date_time, status });
     await appointment.save();
 
     res.status(201).json({ message: "Appointment created successfully", appointment });
