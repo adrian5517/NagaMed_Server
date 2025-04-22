@@ -1,19 +1,25 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 // Import Routes
 const authRoutes = require('./routers/authRoutes');
 const userRoutes = require('./routers/userRouter');
 const appointmentRoutes = require('./routers/appointmentRoutes');
 const doctorRoutes = require("./routers/doctorRoutes");
-const clinicRoutes = require('./routers/clinicRoutes')
+const clinicRoutes = require('./routers/clinicRoutes');
 const feedbackRoutes = require('./routers/feedbackRoutes');
 const systemFeedbackRoutes = require('./routers/systemFeedbackRoutes');
 
 const app = express();
 
 // Middleware
+app.use(cors({ 
+  origin: 'http://localhost:3000', 
+  credentials: true                
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
