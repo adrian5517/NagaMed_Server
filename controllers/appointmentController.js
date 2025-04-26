@@ -1,20 +1,35 @@
 const Appointment = require("../models/appointmentModel");
-
+const mongoose = require("mongoose"); 
 // Create Appointment
 exports.createAppointment = async (req, res) => {
   try {
-    const {patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
+    const {
+      patient_id,
+      doctor_id,
+      clinic_id,
+      appointment_date_time,
+      status
+    } = req.body;
 
-    // Check for duplicate appointment_id
-    // const existingAppointment = await Appointment.findOne({ appointment_id });
-    // if (existingAppointment) {
-    //   return res.status(400).json({ message: "Appointment ID already exists." });
-    // }
+    
+    const appointment = new Appointment({
+      patient_id,
+      doctor_id,
+      clinic_id,
+      appointment_date_time,
+      status
+    });
 
-    const appointment = new Appointment({ patient_id, doctor_id, clinic_id, appointment_date_time, status });
+    
+    appointment.appointment_id = appointment._id.toString();
+
+    // Save to DB
     await appointment.save();
 
-    res.status(201).json({ message: "Appointment created successfully", appointment });
+    res.status(201).json({
+      message: "Appointment created successfully",
+      appointment
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,12 +74,29 @@ exports.updateAppointment = async (req, res) => {
       return res.status(400).json({ message: "Invalid appointment ID." });
     }
 
-    const appointment = await Appointment.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+    // Whitelist allowed updates
+    const allowedUpdates = ["status", "appointment_date_time", "notes", "clinic_id"];
+    const updates = Object.keys(req.body);
+    const isValidUpdate = updates.every(update => allowedUpdates.includes(update));
+
+    if (!isValidUpdate) {
+      return res.status(400).json({ message: "Invalid updates!" });
+    }
+
+    const appointment = await Appointment.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    res.status(200).json({ message: "Appointment updated successfully", appointment });
+    res.status(200).json({ 
+      message: "Appointment updated successfully", 
+      appointment 
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
