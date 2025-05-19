@@ -33,7 +33,7 @@ app.use("/api/doctor", doctorRoutes);
 app.use('/api/clinic', clinicRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/systemfeedback', systemFeedbackRoutes);
-app.use('/api/doctor', doctorAccRoutes);
+app.use('/api/doctorauth', doctorAccRoutes);
 app.get('/', (req, res) => {
   res.send('Welcome to Irinuman Club');
 });
