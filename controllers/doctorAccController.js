@@ -2,6 +2,9 @@ const DoctorAcc = require('../models/doctorAccModel');
 
 exports.registerDoctor = async (req, res) => {
     const { fullname, specialization, email, password } = req.body;
+    if (!req.body || !req.body.password || !req.body.email || !req.body.fullname || !req.body.specialization) {
+        return res.status(400).json({ message: "Missing required fields" });
+    }
     try {
         const existing = await DoctorAcc.findOne({ email });
         if (existing) {
@@ -44,7 +47,8 @@ exports.loginDoctor = async (req, res) => {
             _id: doctor._id,
             fullname: doctor.fullname,
             specialization: doctor.specialization,
-            email: doctor.email
+            email: doctor.email,
+
         });
         
     } catch (error) {
