@@ -1,26 +1,28 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-
 const doctorAccSchema = new mongoose.Schema(
   {
     fullname: {
       type: String,
       required: [true, "Name is required"],
     },
-    username:{
+    username: {
       type: String,
-      
+      required: [true, "Username is required"],
+      unique: true,
+      trim: true
     },
     specialization: {
       type: String,
+      required: [true, "Specialization is required"]
     },
     email: {
       type: String,
       required: [true, "Email is required"],
       unique: true,
     },
-    address:{
+    address: {
       type: String,
     },
     contact: {
@@ -33,7 +35,10 @@ const doctorAccSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
     },
-    profilePicture: { type: String,default:""},
+    profilePicture: { 
+      type: String,
+      default: ""
+    },
   },
   { timestamps: true }
 );

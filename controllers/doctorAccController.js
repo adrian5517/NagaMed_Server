@@ -1,18 +1,32 @@
 const DoctorAcc = require('../models/doctorAccModel');
 
 exports.registerDoctor = async (req, res) => {
-    const { fullname, specialization, email, password } = req.body;
-    if (!req.body || !req.body.password || !req.body.email || !req.body.fullname || !req.body.specialization) {
+    const { fullname, specialization, email, password, username } = req.body;
+    
+    if (!fullname || !specialization || !email || !password || !username) {
         return res.status(400).json({ message: "Missing required fields" });
     }
+
     try {
-        const existing = await DoctorAcc.findOne({ email });
+       
+        const existing = await DoctorAcc.findOne({ 
+            $or: [
+                { email }, 
+                { username }
+            ]
+        });
+
         if (existing) {
-            return res.status(400).json({ message: "Doctor already exists" });
+            return res.status(400).json({ 
+                message: existing.email === email 
+                    ? "Email already exists" 
+                    : "Username already taken"
+            });
         }
 
         const doctor = await DoctorAcc.create({
             fullname,
+            username,
             specialization,
             email,
             password
@@ -21,12 +35,13 @@ exports.registerDoctor = async (req, res) => {
         res.status(201).json({
             _id: doctor._id,
             fullname: doctor.fullname,
+            username: doctor.username,
             specialization: doctor.specialization,
             email: doctor.email
         });
         
     } catch (error) {
-        res.status(500).json({ error: error.message }); // Fixed 'err' to 'error'
+        res.status(500).json({ error: error.message });
     }
 };
 
