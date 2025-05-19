@@ -1,8 +1,8 @@
 const {registerDoctor,loginDoctor} = require("../controllers/doctorAccController");
 const router = require("express").Router();
 
-router.post("/register",registerDoctor);
-router.post("/login",loginDoctor);
+router.post("/signup",registerDoctor);
+router.post("/signin",loginDoctor);
 
 
 module.exports = router;
