@@ -10,7 +10,7 @@ const doctorAccSchema = new mongoose.Schema(
     },
     username:{
       type: String,
-      unique: true,
+      
     },
     specialization: {
       type: String,

@@ -38,8 +38,9 @@ exports.loginDoctor = async (req, res) => {
             return res.status(400).json({ message: "Doctor not found" });
         }
         
-        doctorAccSchema.methods.comparePassword = async function (password){
-            return await bcrypt.compare(password, this.password);
+        const isMatch = await doctor.comparePassword(password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid credentials" });
         }
 
         res.status(200).json({
