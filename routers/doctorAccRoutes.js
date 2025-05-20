@@ -1,8 +1,11 @@
-const {registerDoctor,loginDoctor} = require("../controllers/doctorAccController");
+const doctorController = require('../controllers/doctorAccController');
 const router = require("express").Router();
 
-router.post("/signup",registerDoctor);
-router.post("/signin",loginDoctor);
-
+router.post('/signup', doctorController.registerDoctor);
+router.post('/signin', doctorController.loginDoctor);
+router.get('/', doctorController.getDoctors);
+router.get('/:id', doctorController.getDoctorById);
+router.put('/:id', doctorController.updateDoctor);
+router.delete('/:id', doctorController.deleteDoctor);
 
 module.exports = router;
