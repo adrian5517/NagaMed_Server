@@ -2,8 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const http = require('http'); // <-- ADD THIS
-const { Server } = require('socket.io'); // <-- ADD THIS
+const http = require('http');
+const { Server } = require('socket.io');
 
 // Your route imports
 const authRoutes = require('./routers/authRoutes');
@@ -17,15 +17,16 @@ const doctorAccRoutes = require('./routers/doctorAccRoutes');
 const cron = require('node-cron');
 
 const app = express();
-const server = http.createServer(app); // <-- USE THIS INSTEAD OF app.listen()
+const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000', // <-- your frontend URL
-    methods: ['GET', 'POST']
-  }
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  },
 });
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -53,8 +54,9 @@ job.start();
 mongoose.connect(process.env.DB_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB');
-    server.listen(process.env.PORT || 5000, () => {
-      console.log(`🚀 Server running on port ${process.env.PORT}`);
+    const PORT = 10000;
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
@@ -62,12 +64,11 @@ mongoose.connect(process.env.DB_URI)
   });
 
 
-// 💬 Add this to handle Socket.IO connections
+// Basic Socket.IO setup (example)
 io.on('connection', (socket) => {
-  console.log('🔌 New client connected:', socket.id);
-
+  console.log('A client connected:', socket.id);
   socket.on('disconnect', () => {
-    console.log('❌ Client disconnected:', socket.id);
+    console.log('Client disconnected:', socket.id);
   });
 
   // Add your custom events here
