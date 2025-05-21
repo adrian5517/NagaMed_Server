@@ -86,13 +86,16 @@ exports.authMiddleware = (req, res, next) => {
   }
 };
 
-const logoutUser = async (req, res) => {
-    try {
-        res.clearCookie('token');
-        res.status(200).json({ message: 'Logout successful' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error logging out', error: error.message });
-    }
+exports.logoutUser = async (req, res) => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      path: '/',
+    });
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error logging out', error: error.message });
+  }
 };
-
-module.exports = logoutUser;
