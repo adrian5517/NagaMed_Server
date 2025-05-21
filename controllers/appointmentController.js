@@ -121,3 +121,48 @@ exports.deleteAppointment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getAppointmentsByDoctorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate doctorId
+    if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
+      return res.status(400).json({ message: 'Invalid doctor ID' });
+    }
+
+    // Fetch appointments
+    const appointments = await Appointment.find({ doctor_id: id })
+      .populate('patient_id', 'name contact medicalHistory') // Populate patient details
+      .populate('clinic_id', 'name') // Populate clinic name
+      .lean(); // Convert to plain JavaScript objects
+
+    if (!appointments || appointments.length === 0) {
+      return res.status(200).json([]); // Return empty array if none found
+    }
+
+    // Map to match frontend expected format
+    const formattedAppointments = appointments.map((appt) => ({
+      _id: appt._id,
+      appointment_id: appt.appointment_id,
+      patient_id: appt.patient_id._id,
+      doctor_id: appt.doctor_id,
+      clinic_id: appt.clinic_id._id,
+      appointment_date_time: appt.appointment_date_time,
+      status: appt.status,
+      patient: {
+        name: appt.patient_id.name || 'Unknown',
+        contact: appt.patient_id.contact || 'N/A',
+        medicalHistory: appt.patient_id.medicalHistory || 'None',
+      },
+      clinic: {
+        name: appt.clinic_id.name || 'Unknown',
+      },
+    }));
+
+    res.status(200).json(formattedAppointments);
+  } catch (error) {
+    console.error('Error fetching appointments by doctor ID:', error);
+    res.status(500).json({ message: 'Server error while fetching appointments' });
+  }
+};
