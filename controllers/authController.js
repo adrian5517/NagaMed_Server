@@ -85,7 +85,8 @@ exports.authMiddleware = (req, res, next) => {
     res.status(400).json({ message: "Invalid token" });
   }
 };
- exports.logoutUser = async (req, res) => {
+
+const logoutUser = async (req, res) => {
     try {
         res.clearCookie('token');
         res.status(200).json({ message: 'Logout successful' });
@@ -93,3 +94,5 @@ exports.authMiddleware = (req, res, next) => {
         res.status(500).json({ message: 'Error logging out', error: error.message });
     }
 };
+
+module.exports = logoutUser;
