@@ -35,6 +35,27 @@ exports.createAppointment = async (req, res) => {
   }
 };
 
+// Get Appointments by Doctor ID
+exports.getAppointmentsByDoctorId = async (req, res) => {
+  try {
+    const { doctor_id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(doctor_id)) {
+      return res.status(400).json({ message: "Invalid doctor ID." });
+    }
+
+    const appointments = await Appointment.find({ doctor_id });
+
+    if (!appointments.length) {
+      return res.status(404).json({ message: "No appointments found for this doctor." });
+    }
+
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get All Appointments
 exports.getAllAppointments = async (req, res) => {
   try {
