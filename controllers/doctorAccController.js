@@ -171,4 +171,29 @@ exports.loginDoctor = async (req, res) => {
         console.error('Login error:', error);
         res.status(500).json({ success: false, error: "Login failed." });
     }
+
+    exports.getDoctorsByClinic = async (req, res) => {
+    try {
+        const clinicId = req.params.clinicId;
+
+        // Check if clinic exists
+        const clinic = await Clinic.findById(clinicId);
+        if (!clinic) {
+            return res.status(404).json({ success: false, error: "Clinic not found" });
+        }
+
+        // Fetch doctors from this clinic
+        const doctors = await DoctorAcc.find({ clinic_id: mongoose.Types.ObjectId(clinicId) }).select('-password');
+
+        if (doctors.length === 0) {
+            return res.status(404).json({ success: false, error: "No doctors available for this clinic." });
+        }
+
+        res.status(200).json({ success: true, data: doctors });
+
+    } catch (error) {
+        console.error("Error fetching doctors by clinic:", error);
+        res.status(500).json({ success: false, error: "Failed to fetch doctors by clinic." });
+    }
+};
 };
