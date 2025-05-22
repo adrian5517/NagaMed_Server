@@ -2,18 +2,27 @@ const DoctorAcc = require('../models/doctorAccModel');
 
 // CREATE - Register a new doctor
 exports.registerDoctor = async (req, res) => {
-    const { fullname, specialization, email, password, username } = req.body;
+    const {
+        fullname,
+        clinic_id,
+        specialization,
+        email,
+        password,
+        address,
+        availability,
+        contact
+    } = req.body;
 
     try {
         // Validate required fields
-        const requiredFields = { fullname, specialization, email, password, username };
+        const requiredFields = { fullname, clinic_id, specialization, email, password };
         const missingFields = Object.entries(requiredFields)
             .filter(([_, value]) => !value)
             .map(([key]) => key);
 
         if (missingFields.length > 0) {
-            return res.status(400).json({ 
-                message: `Missing required fields: ${missingFields.join(', ')}` 
+            return res.status(400).json({
+                message: `Missing required fields: ${missingFields.join(', ')}`
             });
         }
 
@@ -23,29 +32,26 @@ exports.registerDoctor = async (req, res) => {
             return res.status(400).json({ message: "Invalid email format" });
         }
 
-        const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
-        
-        // Check if doctor with same email or username exists
-        const existing = await DoctorAcc.findOne({ 
-            $or: [{ email }, { username }] 
-        });
-
+        // Check if doctor with same email already exists
+        const existing = await DoctorAcc.findOne({ email });
         if (existing) {
-            return res.status(400).json({ 
-                message: existing.email === email 
-                    ? "Email already exists" 
-                    : "Username already taken"
-            });
+            return res.status(400).json({ message: "Email already exists" });
         }
+
+        // Generate profile picture
+        const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
 
         // Create doctor
         const doctor = await DoctorAcc.create({
             fullname: fullname.trim(),
-            username: username.trim(),
+            clinic_id,
             specialization: specialization.trim(),
             profilePicture,
             email: email.toLowerCase().trim(),
-            password
+            password,
+            address: address || '',
+            availability: Array.isArray(availability) ? availability : [],
+            contact: contact || ''
         });
 
         res.status(201).json({
@@ -53,9 +59,12 @@ exports.registerDoctor = async (req, res) => {
             data: {
                 _id: doctor._id,
                 fullname: doctor.fullname,
-                username: doctor.username,
                 specialization: doctor.specialization,
+                clinic_id: doctor.clinic_id,
                 email: doctor.email,
+                address: doctor.address,
+                availability: doctor.availability,
+                contact: doctor.contact,
                 profilePicture: doctor.profilePicture
             }
         });
