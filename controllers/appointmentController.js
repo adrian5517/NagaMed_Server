@@ -38,13 +38,13 @@ exports.createAppointment = async (req, res) => {
 // Get Appointments by Doctor ID
 exports.getAppointmentsByDoctorId = async (req, res) => {
   try {
-    const { doctor_id } = req.params;
+    const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(doctor_id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid doctor ID." });
     }
 
-    const appointments = await Appointment.find({ doctor_id });
+    const appointments = await Appointment.find({ doctor_id: id });
 
     if (!appointments.length) {
       return res.status(404).json({ message: "No appointments found for this doctor." });
