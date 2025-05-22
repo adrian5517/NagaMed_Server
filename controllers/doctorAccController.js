@@ -5,6 +5,7 @@ exports.registerDoctor = async (req, res) => {
     const { fullname, specialization, email, password, username } = req.body;
 
     try {
+        // Validate required fields
         const requiredFields = { fullname, specialization, email, password, username };
         const missingFields = Object.entries(requiredFields)
             .filter(([_, value]) => !value)
@@ -16,13 +17,15 @@ exports.registerDoctor = async (req, res) => {
             });
         }
 
+        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ message: "Invalid email format" });
         }
-        const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
-        const userExists = await User.findOne({ email });
 
+        const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
+        
+        // Check if doctor with same email or username exists
         const existing = await DoctorAcc.findOne({ 
             $or: [{ email }, { username }] 
         });
@@ -35,11 +38,12 @@ exports.registerDoctor = async (req, res) => {
             });
         }
 
+        // Create doctor
         const doctor = await DoctorAcc.create({
             fullname: fullname.trim(),
             username: username.trim(),
             specialization: specialization.trim(),
-            profilePicture: user.profilePicture,
+            profilePicture,
             email: email.toLowerCase().trim(),
             password
         });
@@ -52,7 +56,7 @@ exports.registerDoctor = async (req, res) => {
                 username: doctor.username,
                 specialization: doctor.specialization,
                 email: doctor.email,
-                profilePicture: user.profilePicture
+                profilePicture: doctor.profilePicture
             }
         });
 
@@ -65,7 +69,7 @@ exports.registerDoctor = async (req, res) => {
 // READ - Get all doctors
 exports.getDoctors = async (req, res) => {
     try {
-        const doctors = await DoctorAcc.find().select('-password'); // exclude password
+        const doctors = await DoctorAcc.find().select('-password');
         res.status(200).json({ success: true, data: doctors });
     } catch (error) {
         res.status(500).json({ success: false, error: "Failed to fetch doctors." });
@@ -92,6 +96,7 @@ exports.updateDoctor = async (req, res) => {
         if (updateFields.email) {
             updateFields.email = updateFields.email.toLowerCase().trim();
         }
+
         const doctor = await DoctorAcc.findByIdAndUpdate(req.params.id, updateFields, {
             new: true,
             runValidators: true
