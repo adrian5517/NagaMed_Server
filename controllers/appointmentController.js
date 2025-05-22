@@ -145,18 +145,18 @@ exports.getAppointmentsByDoctorId = async (req, res) => {
     const formattedAppointments = appointments.map((appt) => ({
       _id: appt._id,
       appointment_id: appt.appointment_id,
-      patient_id: appt.patient_id._id,
+        patient_id: appt.patient_id && appt.patient_id._id ? appt.patient_id._id : null,
       doctor_id: appt.doctor_id,
-      clinic_id: appt.clinic_id._id,
+      clinic_id: appt.clinic_id && appt.clinic_id._id ? appt.clinic_id._id : null,
       appointment_date_time: appt.appointment_date_time,
       status: appt.status,
       patient: {
-        name: appt.patient_id.name || 'Unknown',
-        contact: appt.patient_id.contact || 'N/A',
-        medicalHistory: appt.patient_id.medicalHistory || 'None',
+        name: appt.patient_id && appt.patient_id.name ? appt.patient_id.name : 'Unknown',
+        contact: appt.patient_id && appt.patient_id.contact ? appt.patient_id.contact : 'N/A',
+        medicalHistory: appt.patient_id && appt.patient_id.medicalHistory ? appt.patient_id.medicalHistory : 'None',
       },
       clinic: {
-        name: appt.clinic_id.name || 'Unknown',
+        name: appt.clinic_id && appt.clinic_id.name ? appt.clinic_id.name : 'Unknown',
       },
     }));
 
