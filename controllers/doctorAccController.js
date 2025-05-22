@@ -181,24 +181,28 @@ exports.loginDoctor = async (req, res) => {
 // READ - Get doctors by clinic ID
 exports.getDoctorsByClinic = async (req, res) => {
   try {
-    const clinicId = req.params.clinicId; // Retrieve the clinicId from URL parameter
+    const clinicId = req.params.id;
 
-    // Check if clinic exists
+    // Validate format of ObjectId
+    if (!mongoose.Types.ObjectId.isValid(clinicId)) {
+      return res.status(400).json({ error: 'Invalid clinic ID format' });
+    }
+
+    // Optional: check if the clinic exists
     const clinic = await Clinic.findById(clinicId);
     if (!clinic) {
-      return res.status(404).json({ error: "Clinic not found" });
+      return res.status(404).json({ error: 'Clinic not found' });
     }
 
-    // Find doctors by clinic_id (ensure the value is properly cast to ObjectId)
-    const doctors = await DoctorAcc.find({ clinic_id: mongoose.Types.ObjectId(clinicId) }); // Ensures correct casting
+    // Find doctors with matching ObjectId
+    const doctors = await Doctor.find({ clinic_id: mongoose.Types.ObjectId(clinicId) });
 
     if (doctors.length === 0) {
-      return res.status(404).json({ error: "No doctors available for this clinic." });
+      return res.status(404).json({ error: 'No doctors available for this clinic.' });
     }
 
-    res.json(doctors);
+    res.status(200).json(doctors);
   } catch (error) {
-    console.error("Error fetching doctors by clinic:", error);
     res.status(500).json({ error: error.message });
   }
 };
