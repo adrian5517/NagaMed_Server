@@ -3,7 +3,12 @@ const mongoose = require('mongoose');
 const clinicSchema = new mongoose.Schema({
   clinic_name: { type: String, required: true },
   contact_info: { type: String, required: true },
-  address: { type: String, required: true },
+  location: {
+    address: { type: String },
+    latitude: { type: Number },
+    longitude: { type: Number }
+  },
+  images: { type: String },
   ratings: {
     type: Number,
     min: 0,
