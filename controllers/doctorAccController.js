@@ -1,4 +1,5 @@
 const DoctorAcc = require('../models/doctorAccModel');
+const Clinic = require('../models/clinicModel'); // Make sure this is the correct path
 
 // CREATE - Register a new doctor
 exports.registerDoctor = async (req, res) => {
@@ -32,13 +33,13 @@ exports.registerDoctor = async (req, res) => {
             return res.status(400).json({ message: "Invalid email format" });
         }
 
-        // Check if doctor with same email already exists
-        const existing = await DoctorAcc.findOne({ email });
+        // Check for existing email
+        const existing = await DoctorAcc.findOne({ email: email.toLowerCase().trim() });
         if (existing) {
             return res.status(400).json({ message: "Email already exists" });
         }
 
-        // Generate profile picture
+        // Generate profile picture URL
         const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
 
         // Create doctor
@@ -140,9 +141,9 @@ exports.loginDoctor = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                message: "Email and password are required" 
+                message: "Email and password are required"
             });
         }
 
@@ -161,7 +162,6 @@ exports.loginDoctor = async (req, res) => {
             data: {
                 _id: doctor._id,
                 fullname: doctor.fullname,
-                username: doctor.username,
                 specialization: doctor.specialization,
                 email: doctor.email
             }
@@ -171,21 +171,21 @@ exports.loginDoctor = async (req, res) => {
         console.error('Login error:', error);
         res.status(500).json({ success: false, error: "Login failed." });
     }
+};
 
-    exports.getDoctorsByClinic = async (req, res) => {
+// READ - Get doctors by clinic ID
+exports.getDoctorsByClinic = async (req, res) => {
     try {
         const clinicId = req.params.clinicId;
 
-        // Check if clinic exists
         const clinic = await Clinic.findById(clinicId);
         if (!clinic) {
             return res.status(404).json({ success: false, error: "Clinic not found" });
         }
 
-        // Fetch doctors from this clinic
-        const doctors = await DoctorAcc.find({ clinic_id: mongoose.Types.ObjectId(clinicId) }).select('-password');
+        const doctors = await DoctorAcc.find({ clinic_id: clinicId }).select('-password');
 
-        if (doctors.length === 0) {
+        if (!doctors || doctors.length === 0) {
             return res.status(404).json({ success: false, error: "No doctors available for this clinic." });
         }
 
@@ -195,5 +195,4 @@ exports.loginDoctor = async (req, res) => {
         console.error("Error fetching doctors by clinic:", error);
         res.status(500).json({ success: false, error: "Failed to fetch doctors by clinic." });
     }
-};
 };
