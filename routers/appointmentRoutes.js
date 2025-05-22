@@ -5,11 +5,13 @@ const {
   getAppointmentById,
   updateAppointment,
   deleteAppointment,
+  getAppointmentsByDoctorId
 } = require("../controllers/appointmentController");
 
 const router = express.Router();
 
 router.post("/", createAppointment);
+router.get('/:doctor_id', appointmentController.getAppointmentsByDoctorId);
 router.get("/", getAllAppointments);
 router.get("/:id", getAppointmentById);
 router.put("/:id", updateAppointment);
