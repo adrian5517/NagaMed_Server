@@ -3,78 +3,83 @@ const Clinic = require('../models/clinicModel'); // Make sure this is the correc
 
 // CREATE - Register a new doctor
 exports.registerDoctor = async (req, res) => {
-    const {
-        fullname,
-        clinic_id,
-        specialization,
-        email,
-        password,
-        address,
-        availability,
-        contact
-    } = req.body;
-
     try {
-        // Validate required fields
+        const {
+            fullname,
+            clinic_id,
+            specialization,
+            email,
+            password,
+            address,
+            availability,
+            contact
+        } = req.body;
+
+        // Step 1: Check for missing required fields
         const requiredFields = { fullname, clinic_id, specialization, email, password };
         const missingFields = Object.entries(requiredFields)
-            .filter(([_, value]) => !value)
+            .filter(([_, value]) => !value?.toString().trim())
             .map(([key]) => key);
 
         if (missingFields.length > 0) {
             return res.status(400).json({
+                success: false,
                 message: `Missing required fields: ${missingFields.join(', ')}`
             });
         }
 
-        // Validate email format
+        // Step 2: Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ message: "Invalid email format" });
+        const normalizedEmail = email.toLowerCase().trim();
+
+        if (!emailRegex.test(normalizedEmail)) {
+            return res.status(400).json({ success: false, message: "Invalid email format" });
         }
 
-        // Check for existing email
-        const existing = await DoctorAcc.findOne({ email: email.toLowerCase().trim() });
-        if (existing) {
-            return res.status(400).json({ message: "Email already exists" });
+        // Step 3: Check for existing email
+        const existingDoctor = await DoctorAcc.findOne({ email: normalizedEmail });
+        if (existingDoctor) {
+            return res.status(400).json({ success: false, message: "Email already exists" });
         }
 
-        // Generate profile picture URL
-        const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
+        // Step 4: Generate profile picture URL
+        const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${normalizedEmail}`;
 
-        // Create doctor
-        const doctor = await DoctorAcc.create({
+        // Step 5: Create and save the doctor
+        const newDoctor = await DoctorAcc.create({
             fullname: fullname.trim(),
             clinic_id,
             specialization: specialization.trim(),
-            profilePicture,
-            email: email.toLowerCase().trim(),
-            password,
-            address: address || '',
+            email: normalizedEmail,
+            password: password.trim(),
+            address: address?.trim() || '',
             availability: Array.isArray(availability) ? availability : [],
-            contact: contact || ''
+            contact: contact?.trim() || '',
+            profilePicture
         });
 
+        // Step 6: Respond with created doctor data (excluding password)
         res.status(201).json({
             success: true,
             data: {
-                _id: doctor._id,
-                fullname: doctor.fullname,
-                specialization: doctor.specialization,
-                clinic_id: doctor.clinic_id,
-                email: doctor.email,
-                address: doctor.address,
-                availability: doctor.availability,
-                contact: doctor.contact,
-                profilePicture: doctor.profilePicture
+                _id: newDoctor._id,
+                fullname: newDoctor.fullname,
+                specialization: newDoctor.specialization,
+                clinic_id: newDoctor.clinic_id,
+                email: newDoctor.email,
+                address: newDoctor.address,
+                availability: newDoctor.availability,
+                contact: newDoctor.contact,
+                profilePicture: newDoctor.profilePicture
             }
         });
 
     } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).json({ success: false, error: "Registration failed." });
+        console.error('Doctor registration failed:', error);
+        res.status(500).json({ success: false, error: "Internal server error during registration." });
     }
 };
+
 
 // READ - Get all doctors
 exports.getDoctors = async (req, res) => {
@@ -175,25 +180,28 @@ exports.loginDoctor = async (req, res) => {
 
 // READ - Get doctors by clinic ID
 exports.getDoctorsByClinic = async (req, res) => {
-  try {
-    const clinicId = req.params.clinicId; // Retrieve the clinicId from URL parameter
+    try {
+        const clinicId = req.params.clinicId;
 
-    // Check if clinic exists
-    const clinic = await Clinic.findById(clinicId);
-    if (!clinic) {
-      return res.status(404).json({ error: "Clinic not found" });
+        // Check if clinic exists
+        const clinic = await Clinic.findById(clinicId);
+        if (!clinic) {
+            return res.status(404).json({ error: "Clinic not found" });
+        }
+
+        // Make sure to use DoctorAcc, not Doctor
+        const doctors = await DoctorAcc.find({
+            clinic_id: mongoose.Types.ObjectId(clinicId) // ✅ cast to ObjectId
+        }).select('-password');
+
+        if (doctors.length === 0) {
+            return res.status(404).json({ error: "No doctors available for this clinic." });
+        }
+
+        res.status(200).json({ success: true, data: doctors });
+
+    } catch (error) {
+        console.error("Error fetching doctors by clinic:", error);
+        res.status(500).json({ error: error.message });
     }
-
-    // Find doctors by clinic_id (ensure the value is properly cast to ObjectId)
-    const doctors = await Doctor.find({ clinic_id: clinicId }); // Ensures correct casting
-
-    if (doctors.length === 0) {
-      return res.status(404).json({ error: "No doctors available for this clinic." });
-    }
-
-    res.json(doctors);
-  } catch (error) {
-    console.error("Error fetching doctors by clinic:", error);
-    res.status(500).json({ error: error.message });
-  }
 };
