@@ -5,9 +5,9 @@ require('dotenv').config();
 // Signup Controller
 exports.signup = async (req, res) => {
   try {
-    const { fullname, email, password } = req.body;
+    const { fullname, email, username, password } = req.body;
 
-    if (!fullname || !email || !password) {
+    if (!fullname || !email || !username || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -16,14 +16,18 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
-    const userExists = await User.findOne({ email });
+    const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+    
+    // Check if user already exists with email or username
+    const userExists = await User.findOne({ 
+      $or: [{ email }, { username }] 
+    });
 
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Email or username already taken" });
     }
 
-    const user = await User.create({ fullname, email, password, profilePicture });
+    const user = await User.create({ fullname, email, username, password, profilePicture });
     const token = user.generateAuthToken();
 
     res.cookie('token', token, {
@@ -37,6 +41,7 @@ exports.signup = async (req, res) => {
         _id: user._id,
         fullname: user.fullname,
         email: user.email,
+        username: user.username,
         profilePicture: user.profilePicture,
       },
     });
