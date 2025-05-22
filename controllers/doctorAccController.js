@@ -20,6 +20,8 @@ exports.registerDoctor = async (req, res) => {
         if (!emailRegex.test(email)) {
             return res.status(400).json({ message: "Invalid email format" });
         }
+        const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;
+        const userExists = await User.findOne({ email });
 
         const existing = await DoctorAcc.findOne({ 
             $or: [{ email }, { username }] 
@@ -37,6 +39,7 @@ exports.registerDoctor = async (req, res) => {
             fullname: fullname.trim(),
             username: username.trim(),
             specialization: specialization.trim(),
+            profilePicture: user.profilePicture,
             email: email.toLowerCase().trim(),
             password
         });
@@ -48,7 +51,8 @@ exports.registerDoctor = async (req, res) => {
                 fullname: doctor.fullname,
                 username: doctor.username,
                 specialization: doctor.specialization,
-                email: doctor.email
+                email: doctor.email,
+                profilePicture: user.profilePicture
             }
         });
 
