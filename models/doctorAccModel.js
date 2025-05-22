@@ -7,7 +7,7 @@ const doctorAccSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required"],
     },
-   clinic_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Clinic', required: [true , "Clinic Id is Required"] }
+   clinic_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Clinic', required: [true , "Clinic Id is Required"] },
     specialization: {
       type: String,
       required: [true, "Specialization is required"]
