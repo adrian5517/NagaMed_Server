@@ -11,7 +11,7 @@ const {
 const router = express.Router();
 
 router.post("/", createAppointment);
-router.get('/doctorauth/:id', appointmentController.getAppointmentsByDoctorId);
+router.get('/doctorauth/:id',getAppointmentsByDoctorId);
 router.get("/", getAllAppointments);
 router.get("/:id", getAppointmentById);
 router.put("/:id", updateAppointment);
