@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
 
 const userSchema = new mongoose.Schema({
   fullname: { type: String, required: true },
