@@ -11,7 +11,7 @@ const {
   deleteAppointmentByUser
 } = require("../controllers/appointmentController");
 
-const { protect } = require("../middleware/authMiddleware");
+
 
 const router = express.Router();
 
@@ -25,9 +25,9 @@ router.get("/", getAllAppointments);
 router.get("/doctorauth/:id", getAppointmentsByDoctorId);
 
 // 🔒 Authenticated user routes
-router.get("/user", protect, getAppointmentsByUser);        
-router.put("/user/:id", protect, updateAppointmentByUser);
-router.delete("/user/:id", protect, deleteAppointmentByUser); 
+router.get("/user",  getAppointmentsByUser);        
+router.put("/user/:id", updateAppointmentByUser);
+router.delete("/user/:id", deleteAppointmentByUser); 
 
 
 // Get, update, delete single appointment by ID (admin/staff/general)
