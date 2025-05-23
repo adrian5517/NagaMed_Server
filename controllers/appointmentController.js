@@ -14,7 +14,7 @@ exports.createAppointment = async (req, res) => {
       status
     });
 
-    appointment.appointment_id = appointment._id.toString();
+    
     await appointment.save();
 
     res.status(201).json({
