@@ -4,9 +4,11 @@ const mongoose = require("mongoose");
 // Create Appointment
 exports.createAppointment = async (req, res) => {
   try {
-    const { patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
+    const { patient_name , patient_id, doctor_id, clinic_id, appointment_date_time, status } = req.body;
 
     const appointment = new Appointment({
+      appointment_id: new mongoose.Types.ObjectId().toHexString(),
+      patient_name,
       patient_id,
       doctor_id,
       clinic_id,

@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const AppointmentSchema = new mongoose.Schema({
+  appointment_id: {
+  type: String,
+  unique: true,
+  required: true
+},
+ patient_name: {
+  type: String,
+},
   patient_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
