@@ -15,7 +15,7 @@ exports.protect = async (req, res, next) => {
             }
 
             // Verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
             if (!decoded.id) {
                 return res.status(401).json({ message: 'Token is invalid or malformed' });
