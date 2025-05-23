@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const AppointmentSchema = new mongoose.Schema({
-  appointment_id: {
-    type: String,
-    unique: true
-  },
   patient_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -28,10 +24,18 @@ const AppointmentSchema = new mongoose.Schema({
     type: String,
     enum: ['Pending', 'Approved', 'Declined'],
     default: 'Pending'
+  },
+  description: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  filled_by: {
+    type: String,
+    enum: ['self', 'relative'],
+    default: 'self'
   }
 }, { timestamps: true });
-
-// appointmentSchema.index({ clinic_id: 1, appointment_date_time: 1 });
 
 const Appointment = mongoose.model('Appointment', AppointmentSchema);
 module.exports = Appointment;

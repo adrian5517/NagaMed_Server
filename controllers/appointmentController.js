@@ -142,3 +142,81 @@ exports.deleteAppointment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getAppointmentsByUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const appointments = await Appointment.find({ patient_id: userId });
+
+    if (!appointments.length) {
+      return res.status(404).json({ message: "No appointments found for this user." });
+    }
+
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ✅ User Update Appointment
+exports.updateAppointmentByUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid appointment ID." });
+    }
+
+    const appointment = await Appointment.findOne({ _id: id, patient_id: userId });
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found or unauthorized" });
+    }
+
+    const allowedUpdates = ["status", "appointment_date_time", "notes", "clinic_id"];
+    const updates = Object.keys(req.body);
+    const isValidUpdate = updates.every(update => allowedUpdates.includes(update));
+
+    if (!isValidUpdate) {
+      return res.status(400).json({ message: "Invalid update fields" });
+    }
+
+    updates.forEach(update => {
+      appointment[update] = req.body[update];
+    });
+
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Appointment updated successfully",
+      appointment
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ✅ User Delete Appointment
+exports.deleteAppointmentByUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid appointment ID." });
+    }
+
+    const appointment = await Appointment.findOneAndDelete({ _id: id, patient_id: userId });
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found or unauthorized" });
+    }
+
+    res.status(200).json({ message: "Appointment deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+

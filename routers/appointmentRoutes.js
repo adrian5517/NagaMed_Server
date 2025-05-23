@@ -5,14 +5,32 @@ const {
   getAppointmentById,
   updateAppointment,
   deleteAppointment,
-  getAppointmentsByDoctorId
+  getAppointmentsByDoctorId,
+  getAppointmentsByUser,
+  updateAppointmentByUser,
+  deleteAppointmentByUser
 } = require("../controllers/appointmentController");
+
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+// Public or authenticated (create could use auth as well)
 router.post("/", createAppointment);
-router.get('/doctorauth/:id',getAppointmentsByDoctorId);
+
+// Get all appointments
 router.get("/", getAllAppointments);
+
+// Get appointments for doctor by ID
+router.get("/doctorauth/:id", getAppointmentsByDoctorId);
+
+// 🔒 Authenticated user routes
+router.get("/user", protect, getAppointmentsByUser);        
+router.put("/user/:id", protect, updateAppointmentByUser);
+router.delete("/user/:id", protect, deleteAppointmentByUser); 
+
+
+// Get, update, delete single appointment by ID (admin/staff/general)
 router.get("/:id", getAppointmentById);
 router.put("/:id", updateAppointment);
 router.delete("/:id", deleteAppointment);
