@@ -4,7 +4,7 @@ require('dotenv').config();
 
 
 
-const User = require('../models/User'); // Adjust as needed
+
 
 exports.signup = async (req, res) => {
   try {
