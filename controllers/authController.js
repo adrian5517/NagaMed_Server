@@ -2,46 +2,56 @@ const User = require("../models/usersModel");
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 
-// Signup Controller
+
+
+const User = require('../models/User'); // Adjust as needed
+
 exports.signup = async (req, res) => {
   try {
-    const { fullname, email, username, password } = req.body;
+    const { fullname, email, password } = req.body;
 
-    if (!fullname || !email || !username || !password) {
+    // Debug log
+    console.log("Signup request body:", req.body);
+
+    // Check required fields
+    if (!fullname || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
-    
-    // Check if user already exists with email or username
-    const userExists = await User.findOne({ 
-      $or: [{ email }, { username }] 
-    });
-
-    if (userExists) {
-      return res.status(400).json({ message: "Email or username already taken" });
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already taken" });
     }
 
-    const user = await User.create({ fullname, email, username, password, profilePicture });
+    // Auto-generate profile picture using email
+    const profilePicture = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`;
+
+    // Create user
+    const user = await User.create({ fullname, email, password, profilePicture });
+
+    // Generate token
     const token = user.generateAuthToken();
 
+    // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // Return created user info
     res.status(201).json({
       user: {
         _id: user._id,
         fullname: user.fullname,
         email: user.email,
-        username: user.username,
         profilePicture: user.profilePicture,
       },
     });
@@ -50,6 +60,7 @@ exports.signup = async (req, res) => {
     res.status(500).json({ message: "Something went wrong. Please try again later." });
   }
 };
+
 
 // Signin Controller
 exports.signin = async (req, res) => {
